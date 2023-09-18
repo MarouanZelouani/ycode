@@ -11,19 +11,19 @@ int main ()
     i = 0;
     while (i < size - 1)
     {
-        j = i + 1;
-        while (j < size)
+        j = 0;
+        while (j < size - i - 1)
         {
-            if (tab[i] > tab[j])
+            if (tab[j] > tab[j+1])
             {
-                tmp = tab[i];
-                tab[i] = tab[j];
-                tab[j] = tmp;
+                tmp = tab[j];
+                tab[j] = tab[j+1];
+                tab[j+1] = tmp; 
             }
             j++;
         }
         i++;
     }
     i = 0;
-    while (i < size) printf("%d\n", tab[i++]);      
+    while (i < size) printf("%d\n", tab[i++]);
 }
