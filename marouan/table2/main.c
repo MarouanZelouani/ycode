@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-void add_student(char names[][50], int grades[], int size)
+void add_student(char names[][50], float grades[], int size)
 {
     int i;
 
@@ -12,13 +12,13 @@ void add_student(char names[][50], int grades[], int size)
         scanf("%s", names[i]);
         //gets(names[i]);
         printf("enter student grade :");
-        scanf("%d", &grades[i]);
+        scanf("%f", &grades[i]);
         printf("-------------------------->\n");
         i++;
     }
 }
 
-void search_note_byname(char names[][50], int grades[], int size)
+void search_note_byname(char names[][50], float grades[], int size)
 {
     char name[50];
     int i;
@@ -34,13 +34,15 @@ void search_note_byname(char names[][50], int grades[], int size)
             grade_index = i;
         i++;
     }
-
-    printf("this the current grade of --> %s : %d\n", name, grades[grade_index]);
+    if (grade_index == -1)
+        printf("can not be found !!!!!!");
+    else 
+        printf("this the current grade of --> %s : %.2f\n", name, grades[grade_index]);
 }
 
-int somme (int size, int grades[])
+float somme (int size, float grades[])
 {
-    int s = 0;
+    float s = 0;
     int i = 0;
 
     while (i < size)
@@ -51,14 +53,14 @@ int somme (int size, int grades[])
     return s;
 }
 
-int moyenne(int size, int grades[])
+float moyenne(int size, float grades[])
 {
-    int s ;
+    float s ;
     s = somme(size, grades) / size;
     return s;
 }
 
-void display_students(char names[][50], int grades[], int size)
+void display_students(char names[][50], float grades[], int size)
 {
     int i;
 
@@ -67,17 +69,17 @@ void display_students(char names[][50], int grades[], int size)
     {
         printf("------> student %i :\n", i+1);
         printf("name : %s\n", names[i]);
-        printf("grade : %d\n", grades[i]);
+        printf("grade : %.2f\n", grades[i]);
         printf("-------------------------->\n");
         i++;
     }
 }
 
-void modify_grade(char names[][50], int grades[], int size)
+void modify_grade(char names[][50], float grades[], int size)
 {
     int i;
-    int updated_grade;
-    int grade_index = 0;
+    float updated_grade;
+    int grade_index = -1;
     char name[50];
 
     printf("enter the name of student u wann update:");
@@ -91,14 +93,19 @@ void modify_grade(char names[][50], int grades[], int size)
         i++;
     }
 
-    printf("this the current grade of --> %s : %d\n", name, grades[grade_index]);
-    printf("enter the new value :");
-    scanf("%d", &updated_grade);
+    if (grade_index == -1)
+        printf("can not be found !!!!!!");
+    else
+    {
+        printf("this the current grade of --> %s : %.2f\n", name, grades[grade_index]);
+        printf("enter the new value :");
+        scanf("%f", &updated_grade);
 
-    grades[grade_index] = updated_grade;
+        grades[grade_index] = updated_grade;
+    }
 }
 
-void cmp_to_moyenne (int grades[], int size, int moyenne)
+void cmp_to_moyenne (float grades[], int size, float moyenne)
 {
     int i;
 
@@ -106,16 +113,16 @@ void cmp_to_moyenne (int grades[], int size, int moyenne)
     while (i < size)
     {
         if (grades[i] == moyenne)
-            printf("%d = moyenne\n", grades[i]);
+            printf("%.2f = moyenne\n", grades[i]);
         else if (grades[i] < moyenne)
-            printf("%d < moyenne\n", grades[i]);
+            printf("%.2f < moyenne\n", grades[i]);
         else 
-            printf("%d > moyenne\n", grades[i]);
+            printf("%.2f > moyenne\n", grades[i]);
         i++;
     }
 }
 
-int how_many_sup(int grades[], int size, int moyenne)
+int how_many_sup(float grades[], int size, float moyenne)
 {
     int i;
     int count = 0;
@@ -130,10 +137,10 @@ int how_many_sup(int grades[], int size, int moyenne)
     return count;
 }
 
-void min_grade (int grades[], int size)
+void min_grade (float grades[], int size)
 {
     int i;
-    int min = grades[0];
+    float min = grades[0];
     int index = 0;
 
     i = 0;
@@ -155,13 +162,13 @@ void min_grade (int grades[], int size)
         i++;
     }
 
-    printf("min = %d in index = %d\n", min, index);
+    printf("min = %.2f in index = %d\n", min, index);
 }
 
-void max_grade (int grades[], int size)
+void max_grade (float grades[], int size)
 {
     int i;
-    int max = grades[0];
+    float max = grades[0];
     int index = 0;
 
     i = 0;
@@ -183,10 +190,10 @@ void max_grade (int grades[], int size)
         i++;
     }
 
-    printf("max = %d in index = %d\n", max, index);
+    printf("max = %.2f in index = %d\n", max, index);
 }
 
-int delete_student(char names[][50], int grades[], int size)
+int delete_student(char names[][50], float grades[], int size)
 {
     int i;
     int index = 0;
@@ -205,7 +212,7 @@ int delete_student(char names[][50], int grades[], int size)
         i++;
     }
 
-    printf("u shure u want to delete --> %s --> grade : %d\n", name, grades[index]);
+    printf("u shure u want to delete --> %s --> grade : %.2f\n", name, grades[index]);
     printf("enter 1 to continue 0 to quite :");
     scanf("%d", &to_continue);
 
@@ -221,7 +228,7 @@ int delete_student(char names[][50], int grades[], int size)
         i = index;
         while (i < size - 1)
         {
-            grades[i], grades[i+1];
+            grades[i] = grades[i+1];
             i++;
         }
 
@@ -230,11 +237,11 @@ int delete_student(char names[][50], int grades[], int size)
     return new_size;
 }
 
-void sort_student(char names[][50], int grades[], int size)
+void sort_student(char names[][50], float grades[], int size)
 {
     int i;
     int j;
-    int tmp;
+    float tmp;
     char name_holder[50];
 
     i = 0;
@@ -259,6 +266,79 @@ void sort_student(char names[][50], int grades[], int size)
     }
 }
 
+int menu (int choice_number, char names[][50], float grades[], int size) 
+{
+    int new = size;
+    int h;
+    switch (choice_number) {
+        case 1:
+            display_students(names, grades, size);
+            printf("---------------------------------------->\n");
+            break;
+        case 2:
+            modify_grade(names, grades, size);
+            break;
+        case 3:
+            new = delete_student(names, grades, size);
+            break;
+        case 4:
+            sort_student(names, grades, size);
+            break;
+        case 5:
+            printf("moyenne : %.2f\n", moyenne(size, grades));
+            printf("--------------------------------------->\n");
+            break;
+        case 6:
+            cmp_to_moyenne(grades, size, moyenne(size, grades));
+            printf("---------------------------------------->\n");
+            break;
+        case 7:
+            h = how_many_sup(grades, size, moyenne(size, grades));
+            printf("how manny grades is sup to moyenne : %d\n", h);
+            printf("----------------------------------------->\n");
+            break;
+        case 8:
+            min_grade(grades, size);
+            printf("---------------------------------------->\n");
+            break;
+        case 9:
+            max_grade(grades, size);
+            printf("---------------------------------------->\n");
+            break;
+        case 10:
+            search_note_byname(names, grades, size);
+            printf("---------------------------------------->\n");
+            break;
+    }
+    return new;
+}
+
+int print_menu (int error)
+{
+    int choice;
+
+    if (error == -1)
+        printf("invalid choice!!! try again :) .\n");
+    printf("*----------------------------MENU-----------------------------*\n");
+    printf("* Press 1 to display student.                                 *\n");
+    printf("* Press 2 to modify student grade.                            *\n");
+    printf("* Press 3 to delete a student.                                *\n");
+    printf("* Press 4 to sort students by there grade.                    *\n");
+    printf("* Press 5 to calculate and display moyenne.                   *\n");
+    printf("* Press 6 to compare grades to moyenne.                       *\n");
+    printf("* Press 7 to calculate how many grades are sup to moyenne.    *\n");
+    printf("* Press 8 to print min gade.                                  *\n");
+    printf("* Press 9 to print max grade                                  *\n");
+    printf("* Press 10 to search for grade by student.                    *\n");
+    printf("* Press -1 to quit.                                           *\n");
+    printf("*-------------------------------------------------------------*\n");
+    printf("* Enter your choice:                                           \n");
+    scanf("%d", &choice);
+    printf("*-------------------------------------------------------------*\n");
+
+    return choice;
+}
+
 int main ()
 {
     int size;
@@ -280,23 +360,42 @@ int main ()
     }
     
     char names[size][50];
-    int grades[size];
+    float grades[size];
 
+    printf("-------------------------->\n");
     add_student(names, grades, size);
+
+    /*
+    modify_grade(names, grades, size);
     display_students(names, grades, size);
-    //modify_grade(names, grades, size);
-    //display_students(names, grades, size);
-    //size = delete_student(names, grades, size);
-    //display_students(names, grades, size);
-    //sort_student(names, grades, size);
-    //display_students(names, grades, size);
-    //printf("moyenne : %d\n", moyenne(size, grades));
-    //printf("-------------------------->\n");
-    //cmp_to_moyenne(grades, size, moyenne(size, grades));
-    //printf("-------------------------->\n");
-    //int h = how_many_sup(grades, size, moyenne(size, grades));
-    //printf("how manny grades is sup to moyenne : %d\n", h);
-    //printf("-------------------------->\n");
-    //min_grade(grades, size);
-    //max_grade(grades, size);
+    size = delete_student(names, grades, size);
+    display_students(names, grades, size);
+    printf("-------------------------->\n");
+    sort_student(names, grades, size);
+    display_students(names, grades, size);
+    printf("moyenne : %.2f\n", moyenne(size, grades));
+    printf("-------------------------->\n");
+    cmp_to_moyenne(grades, size, moyenne(size, grades));
+    printf("-------------------------->\n");
+    int h = how_many_sup(grades, size, moyenne(size, grades));
+    printf("how manny grades is sup to moyenne : %d\n", h);
+    printf("-------------------------->\n");
+    min_grade(grades, size);
+    printf("-------------------------->\n");
+    max_grade(grades, size);
+    */
+    
+
+    int choice_number;
+    int stop = 1;
+    while (stop != -1)
+    {
+        choice_number = print_menu(1);
+        if(choice_number >= 1 && choice_number <= 10)
+            size = menu(choice_number, names, grades, size);
+        else if (choice_number == -1)
+            stop = -1;
+        else 
+            choice_number = print_menu(-1);
+    } 
 }
