@@ -4,6 +4,8 @@
 void add_student(char names[][50], float grades[], int size)
 {
     int i;
+    int error = 0;
+    int print_error = 0;
 
     i = 0;
     while (i < size)
@@ -11,8 +13,21 @@ void add_student(char names[][50], float grades[], int size)
         printf("enter name of the student :");
         scanf("%s", names[i]);
         //gets(names[i]);
-        printf("enter student grade :");
-        scanf("%f", &grades[i]);
+
+        while (error == 0)
+        { 
+            if (print_error == 1)
+                printf("enter another value >= 0 and <= 20 !!!!!\n");
+            printf("enter student grade :");
+            scanf("%f", &grades[i]);
+            if ((grades[i] >= 0) && (grades[i] <= 20))
+            {
+                error = 1;
+            }
+            else print_error = 1;
+        }
+        print_error = 0;
+        error = 0;
         printf("-------------------------->\n");
         i++;
     }
