@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <conio.h>
 #include <string.h>
 #include <stdbool.h>
 
@@ -17,35 +16,27 @@ typedef struct task
     int id;
     char title[50];
     char description[100];
-    int deadline;
+    Date deadline;
     char status[50];
     Date date;
 } task;
-
-bool is_Emty(task t[], int size)
-{
-    bool isEmpty = true;
-    int i;
-
-    i = 0;
-    while (i < size)
-    {
-        if (t[i].id != 0 || t[i].title[0] != '\0' || 
-            t[i].description[0] != '\0' || t[i].deadline != 0 || 
-            t[i].status[i] != '\0' || t[i].date.day != 0 ||
-            t[i].date.month != 0 || t[i].date.year != 0) {
-            isEmpty = false;
-            break;
-        }
-        i++;
-    }
-    return !isEmpty;
-}
 
 void freeTask(task* t) {
     if (t != NULL) {
         free(t);
     }
+}
+
+bool is_valid_date (int day, int month, int year)
+{
+    time_t t;
+    t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    if (day < tm.tm_mday || month < tm.tm_mon+1 )
+        if (year < tm.tm_year+1900)
+            return false;
+    return true;
 }
 
 void display_task(task t)
@@ -54,7 +45,7 @@ void display_task(task t)
     printf("id : %d\n", t.id);
     printf("title : %s\n", t.title);
     printf("description : %s\n", t.description);
-    printf("deadline : %d\n", t.deadline);
+    printf("deadline : %d-%d-%d\n", t.deadline.day, t.deadline.month, t.deadline.year);
     printf("status : %s\n", t.status);
     printf("Date : %d-%d-%d\n", t.date.day, t.date.month, t.date.year);
 }
@@ -73,40 +64,69 @@ void display_tasks(task tasks[], int size)
 
 void add_task(task *tasks, int size)
 {
-    //(*size)++;
-    /*
-    if (!is_Emty(tasks, (*(size) - 1)))
-    {
-        printf("realoc\n");
-        tasks = (task*)realloc(tasks, ((*size) * sizeof(task)));
-        if (tasks == NULL) {
-            printf("Memory allocation failed!!");
-            return ;
-        }
-    }
-    
-    else 
-    {
-        tasks = (task*)malloc((*size) * sizeof(task));
-        printf("malloc\n");
-        if (tasks == NULL) {
-            printf("Memory allocation failed!!");
-            return ;
-        }
-    }
-    */
-    
-        
-    printf("id :");
-    scanf("%d", &tasks[size - 1].id);
+    char status_holder;
+    int error = 0;
+    int print_error = 0;
+    char temp;
+    char temp1;
+
+    tasks[size - 1].id = size;
     printf("title :");
-    scanf("%s", tasks[size - 1].title);
+    scanf("%c",&temp);
+	fgets(tasks[size - 1].title, 50, stdin);
+    tasks[size - 1].title[strcspn(tasks[size - 1].title, "\n")] = 0;
     printf("description :");
-    scanf("%s", tasks[size - 1].description);
-    printf("deadline :");
-    scanf("%d", &tasks[size - 1].deadline);
-    printf("status :");
-    scanf("%s", tasks[size - 1].status);
+    scanf("%c",&temp1);
+	fgets(tasks[size - 1].description, 100, stdin);
+    tasks[size - 1].description[strcspn(tasks[size - 1].description, "\n")] = 0;
+
+    while (error == 0)
+    {   
+        if (print_error == 1)
+        {
+            printf("error!!!!!\n");
+            printf("invalid date ----> try again!!!!\n");
+        }
+        printf("Deadline :\n");
+        printf("day :");
+        scanf("%d", &tasks[size - 1].deadline.day);
+        printf("month :");
+        scanf("%d", &tasks[size - 1].deadline.month);
+        printf("year :");
+        scanf("%d", &tasks[size - 1].deadline.year);
+        if (is_valid_date(tasks[size - 1].deadline.day, 
+            tasks[size - 1].deadline.month, 
+            tasks[size - 1].deadline.year))
+        {
+            error = 1;
+        }
+        else print_error = 1;
+    }
+
+    error = 0;
+    print_error = 0;
+
+    while (error == 0)
+    {   
+        if (print_error == 1)
+        {
+            printf("error!!!!!\n");
+            printf("status ----> (todo , doing, done)\n");
+        }   
+        printf("status :");
+        scanf("%s", tasks[size - 1].status);
+        if (strcmp(tasks[size - 1].status, "todo") == 0 || 
+            strcmp(tasks[size - 1].status, "doing") == 0 || 
+            strcmp(tasks[size - 1].status, "done") == 0)
+        {
+            error = 1;
+        }
+        else print_error = 1;
+    }
+
+    error = 0;
+    print_error = 0;
+
     printf("------------------------------->\n");
 
     time_t t;
@@ -120,24 +140,76 @@ void add_task(task *tasks, int size)
 
 void add_tasks(task *tasks, int size, int s, int flag)
 {
-    int i;
+    int i = 0;
+    int error = 0;
+    int print_error = 0;
+    char temp;
+    char temp1;
 
-    if (flag = 0)
+    if(flag == 1)
         i = 0;
-    else 
-        i = size - 1;
+    else if (flag > 1)
+        i = size;
+    printf("%d\n",i);
     while (i < s)
     {
-        printf("id :");
-        scanf("%d", &tasks[i].id);
+        tasks[i].id = i + 1;
         printf("title :");
-        scanf("%s", tasks[i].title);
+        scanf("%c",&temp);
+	    fgets(tasks[i].title, 50, stdin);
+        tasks[i].title[strcspn(tasks[i].title, "\n")] = 0;
         printf("description :");
-        scanf("%s", tasks[i].description);
-        printf("deadline :");
-        scanf("%d", &tasks[i].deadline);
-        printf("status :");
-        scanf("%s", tasks[i].status);
+        scanf("%c",&temp1);
+	    fgets(tasks[i].description, 100, stdin);
+        tasks[i].description[strcspn(tasks[i].description, "\n")] = 0;
+        
+        while (error == 0)
+        {   
+            if (print_error == 1)
+            {
+                printf("error!!!!!\n");
+                printf("invalid date ----> try again!!!!\n");
+            }
+            printf("Deadline :\n");
+            printf("day :");
+            scanf("%d", &tasks[i].deadline.day);
+            printf("month :");
+            scanf("%d", &tasks[i].deadline.month);
+            printf("year :");
+            scanf("%d", &tasks[i].deadline.year);
+            if (is_valid_date(tasks[i].deadline.day, 
+                tasks[i].deadline.month, 
+                tasks[i].deadline.year))
+            {
+                error = 1;
+            }
+            else print_error = 1;
+        }
+
+        error = 0;
+        print_error = 0;
+        
+        while (error == 0)
+        {   
+            if (print_error == 1)
+            {
+                printf("error!!!!!\n");
+                printf("status ----> (todo , doing, done)\n");
+            }   
+            printf("status :");
+            scanf("%s", tasks[i].status);
+            if (strcmp(tasks[i].status, "todo") == 0 || 
+                strcmp(tasks[i].status, "doing") == 0 || 
+                strcmp(tasks[i].status, "done") == 0)
+            {
+                error = 1;
+            }
+            else print_error = 1;
+        }
+
+        error = 0;
+        print_error = 0;
+
         printf("---------------------------->\n");
 
         time_t t;
@@ -151,125 +223,108 @@ void add_tasks(task *tasks, int size, int s, int flag)
     }
 }
 
+int print_menu (int error)
+{
+    int choice;
+
+    if (error == -1)
+        printf("invalid choice!!! try again :) .\n");
+    printf("*----------------------------MENU-----------------------------*\n");
+    printf("* Press 0 to add multible tasks.                              *\n");
+    printf("* Press 1 to add one task.                                    *\n");
+    printf("* Press 2 to disalay tasks.                                   *\n");
+    printf("* Press -1 to quit.                                           *\n");
+    printf("*-------------------------------------------------------------*\n");
+    printf("* Enter your choice:                                           \n");
+    scanf("%d", &choice);
+    printf("*-------------------------------------------------------------*\n");
+
+    return choice;
+}
+
 int main()
 {
     int size = 0;
-    int s;
+    int s = 0;
     int option;
     task* tasks = NULL;
     int stop = 0;
     int flag = 0;
+    int error = 0;
 
     
 
     while (stop != -1)
     {
 
-    printf("enter option :");
-    scanf("%d", &option);
+        //printf("enter option :");
+        //scanf("%d", &option);
 
-    if (option == 0)
-    {
-        printf("enter size :");
-        scanf("%d", &s);
-        size = size + s;
+        option = print_menu(0);
 
-        if (flag > 0)
+        if (option == 0)
         {
-            printf("realoc\n");
-            tasks = (task*)realloc(tasks, (size * sizeof(task)));
-            if (tasks == NULL) {
-                printf("Memory allocation failed!!");
-                return 1;
+            printf("enter size :");
+            scanf("%d", &s);
+            int size1 = size;
+            size = size + s;
+
+            if (flag > 0)
+            {
+                flag++;
+                tasks = (task*)realloc(tasks, (size * sizeof(task)));
+                if (tasks == NULL) {
+                    printf("Memory allocation failed!!");
+                    return 1;
+                }
             }
-        }
-        if (flag == 0)
-        {
-            flag++;
-            printf("malloc\n");
-            tasks = (task*)malloc(size * sizeof(task));
-            if (tasks == NULL) {
-                printf("Memory allocation failed");
-                return 1;
+            if (flag == 0)
+            {
+                flag++;
+                tasks = (task*)malloc(size * sizeof(task));
+                if (tasks == NULL) {
+                    printf("Memory allocation failed");
+                    return 1;
+                }
             }
-        }
         
-        printf("<-----------------add tasks---------------->\n");
-        add_tasks(tasks, size, s, flag);
-    }
-    if (option == 1)
-    {
-        size++;
-        if (flag > 0)
+            printf("<-----------------add tasks---------------->\n");
+            add_tasks(tasks, size1, size, flag);
+        }
+        if (option == 1)
         {
-            printf("realoc\n");
-            tasks = (task*)realloc(tasks, (size * sizeof(task)));
-            if (tasks == NULL) {
-                printf("Memory allocation failed!!");
-                return 1;
+            size++;
+            if (flag > 0)
+            {
+                flag++;
+                tasks = (task*)realloc(tasks, (size * sizeof(task)));
+                if (tasks == NULL) {
+                    printf("Memory allocation failed!!");
+                   return 1;
+                }
             }
+            if (flag == 0)
+            {
+                flag++;
+                tasks = (task*)malloc(size * sizeof(task));
+                if (tasks == NULL) {
+                    printf("Memory allocation failed");
+                    return 1;
+                }
+            }
+
+            printf("<---------------add one task--------------->\n");
+            add_task(tasks, size);
         }
-        if (flag == 0)
+        if (option == 2)
         {
-            flag++;
-            printf("malloc\n");
-            tasks = (task*)malloc(size * sizeof(task));
-            if (tasks == NULL) {
-                printf("Memory allocation failed");
-                return 1;
-            }
+            printf("<-------------display all tasks------------>\n");
+            display_tasks(tasks, size);
         }
-
-        printf("<---------------add one task--------------->\n");
-        add_task(tasks, size);
+        if (option == -1)
+            stop = -1;
     }
-    if (option == -1)
-        stop = -1;
-
-    printf("<-------------display all tasks------------>\n");
-    display_tasks(tasks, size);
-    }
-
-    /* 
-    task* tasks = (task*)malloc(size * sizeof(task));
-    if (tasks == NULL) {
-        printf("Memory allocation failed");
-        return 1;
-    }
-    
-    
-
-    
-    printf("<-----------------add tasks---------------->\n");
-    add_tasks(tasks, size);
-    printf("<-------------display all tasks------------>\n");
-    display_tasks(tasks, size);
-    printf("<---------------add one task--------------->\n");
-    size++;
-    if (is_Emty(tasks, (size - 1)))
-    {
-        printf("realoc\n");
-        tasks = (task*)realloc(tasks, (size * sizeof(task)));
-        if (tasks == NULL) {
-            printf("Memory allocation failed!!");
-            return 1;
-        }
-    }
-    else 
-    {
-        tasks = (task*)malloc(size * sizeof(task));
-        printf("malloc\n");
-        if (tasks == NULL) {
-            printf("Memory allocation failed!!");
-            return 1;
-        }
-    }
-    add_task(tasks, &size);
-    printf("%d\n", size);
-    printf("<-------------display all tasks------------>\n");
-    display_tasks(tasks, size);
-    */
 
     free(tasks);
-    printf("nice you make it :)");
+    printf("nice you make it :)\n");
 }
