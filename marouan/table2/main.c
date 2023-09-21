@@ -227,7 +227,7 @@ int delete_student(char names[][50], float grades[], int size)
         i++;
     }
 
-    printf("u shure u want to delete --> %s --> grade : %.2f\n", name, grades[index]);
+    printf("u sure u want to delete --> %s --> grade : %.2f\n", name, grades[index]);
     printf("enter 1 to continue 0 to quite :");
     scanf("%d", &to_continue);
 

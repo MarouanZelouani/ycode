@@ -4,6 +4,10 @@
 #include <string.h>
 #include <stdbool.h>
 
+// reading data from file 
+// search by anything
+// collaborateur list 
+
 typedef struct date
 {
     int day;
@@ -21,33 +25,56 @@ typedef struct task
     Date date;
 } task;
 
-void freeTask(task* t) {
-    if (t != NULL) {
-        free(t);
-    }
-}
-
+// is valid funcction is not completed yet
 bool is_valid_date (int day, int month, int year)
 {
     time_t t;
     t = time(NULL);
     struct tm tm = *localtime(&t);
 
+    if (day < 1 || day > 31)
+        return false;
+    
+    if (month < 1 || month > 12)
+        return false;
+
     if (day < tm.tm_mday || month < tm.tm_mon+1 )
-        if (year < tm.tm_year+1900)
-            return false;
-    return true;
+        if (year > tm.tm_year+1900)
+            return true;
+        else return false;
+}
+
+int date_to_days(Date date) {
+    struct tm timeinfo = {0};
+    timeinfo.tm_year = date.year - 1900;
+    timeinfo.tm_mon = date.month - 1;
+    timeinfo.tm_mday = date.day;
+
+    timeinfo.tm_hour = 0;
+    timeinfo.tm_min = 0;
+    timeinfo.tm_sec = 0;
+
+    time_t epochTime = mktime(&timeinfo);
+    int days = (epochTime / (60 * 60 * 24));
+    return days;
+}
+
+int days_left(Date current_date, Date given_date) {
+    int current_days = date_to_days(current_date);
+    int given_days = date_to_days(given_date);
+
+    return  given_days - current_days;
 }
 
 void display_task(task t)
 {
-    printf("---------------------->\n");
     printf("id : %d\n", t.id);
     printf("title : %s\n", t.title);
     printf("description : %s\n", t.description);
     printf("deadline : %d-%d-%d\n", t.deadline.day, t.deadline.month, t.deadline.year);
     printf("status : %s\n", t.status);
     printf("Date : %d-%d-%d\n", t.date.day, t.date.month, t.date.year);
+    printf("---------------------->\n");
 }
 
 void display_tasks(task tasks[], int size)
@@ -150,7 +177,6 @@ void add_tasks(task *tasks, int size, int s, int flag)
         i = 0;
     else if (flag > 1)
         i = size;
-    printf("%d\n",i);
     while (i < s)
     {
         tasks[i].id = i + 1;
@@ -223,6 +249,332 @@ void add_tasks(task *tasks, int size, int s, int flag)
     }
 }
 
+// sort still not competed yet ------> done--;
+// task 3 :  task that have 3 day or les in there deadline -----> completed
+// test sort by deadline ---> logic done
+void display_tasks_sorted (task *tasks, int size, int sort_type)
+{
+    int i;
+    int j;
+    task tmp;
+
+    i = 0;
+    while (i < size - 1)
+    {
+        j = i + 1;
+        while (j < size)
+        {
+            if (sort_type == 1)
+            {
+                if (tasks[i].title[0] > tasks[j].title[0])
+                {
+                    tmp = tasks[i];
+                    tasks[i] = tasks[j];
+                    tasks[j] = tmp;
+                }
+            }
+            else if (sort_type == 2)
+            {
+                printf("2\n");
+                if (tasks[i].deadline.year > (int)tasks[j].deadline.year)
+                {
+                    printf("year\n");
+                    tmp = tasks[i];
+                    tasks[i] = tasks[j];
+                    tasks[j] = tmp;
+                }
+                else if (tasks[i].deadline.year == tasks[j].deadline.year)
+                {
+                    if (tasks[i].deadline.month > tasks[j].deadline.month)
+                    {
+                        tmp = tasks[i];
+                        tasks[i] = tasks[j];
+                        tasks[j] = tmp;
+                    }
+                    else if (tasks[i].deadline.month == tasks[j].deadline.month)
+                    {
+                        if (tasks[i].deadline.day > tasks[j].deadline.day)
+                        {
+                            tmp = tasks[i];
+                            tasks[i] = tasks[j];
+                            tasks[j] = tmp;
+                        }
+                    }
+                }
+            }
+            else if (sort_type == 3)
+            {
+                int i = 0;
+                Date current_date;
+                Date given_date;
+
+                time_t t;
+                t = time(NULL);
+                struct tm tm = *localtime(&t);
+
+                current_date.day = tm.tm_mday;
+                current_date.month = tm.tm_mon+1;
+                current_date.year = tm.tm_year+1900;
+                
+                while (i < size)
+                {
+                    given_date = tasks[i].deadline;
+                
+                    if (days_left(current_date, given_date) <= 3)
+                    {
+                        printf("--------> %d day left\n", days_left(current_date, given_date));
+                        display_task(tasks[i]);
+                    }
+                    i++;
+                }
+                
+            }
+            j++;
+        }
+        i++;
+    }
+}
+
+void modify_task (task *tasks, int size, int modify_option)
+{
+    int i;
+    int task_index = -1;
+    int id;
+    char temp;
+    int error = 0;
+    int print_error = 0;
+
+    printf("enter the id of task u wann update:");
+    scanf("%d", &id);
+
+    i = 0;
+    while (i < size && task_index == -1)
+    {
+        printf("1\n");
+        if(id == tasks[i].id)
+            task_index = i;
+        i++;
+    }
+
+    if (task_index == -1)
+        printf("can not be found !!!!!!\n");
+    else
+    {
+        printf("task you wanna modify --> %d : %s\n", id, tasks[task_index].title);
+        if (modify_option == 1)
+        {
+            printf("new description :");
+            scanf("%c",&temp);
+	        fgets(tasks[task_index].description, 100, stdin);
+            tasks[task_index].description[strcspn(tasks[task_index].description, "\n")] = 0;
+
+            //strcpy(tasks[task_index].description, updated_description);
+        }
+        else if (modify_option == 2)
+        {
+            while (error == 0)
+            {   
+                if (print_error == 1)
+                {
+                    printf("error!!!!!\n");
+                    printf("status ----> (todo , doing, done)\n");
+                }   
+                printf("new status :");
+                scanf("%s", tasks[task_index].status);
+                if (strcmp(tasks[task_index].status, "todo") == 0 || 
+                    strcmp(tasks[task_index].status, "doing") == 0 || 
+                    strcmp(tasks[task_index].status, "done") == 0)
+                {
+                    error = 1;
+                }
+                else print_error = 1;
+            }
+
+            error = 0;
+            print_error = 0;
+
+        }
+        else if (modify_option == 3)
+        {
+            while (error == 0)
+            {   
+                if (print_error == 1)
+                {
+                    printf("error!!!!!\n");
+                    printf("invalid date ----> try again!!!!\n");
+                }
+                printf("new Deadline :\n");
+                printf("day :");
+                scanf("%d", &tasks[task_index].deadline.day);
+                printf("month :");
+                scanf("%d", &tasks[task_index].deadline.month);
+                printf("year :");
+                scanf("%d", &tasks[task_index].deadline.year);
+                if (is_valid_date(tasks[task_index].deadline.day, 
+                    tasks[task_index].deadline.month, 
+                    tasks[task_index].deadline.year))
+                {
+                    error = 1;
+                }
+                else print_error = 1;
+            }
+
+            error = 0;
+            print_error = 0;
+        }
+    }
+}
+
+int delete_task (task *tasks, int *size)
+{
+    int i;
+    int task_index = -1;
+    int id;
+    int to_continue = 0;
+    int passed = 0;
+
+    printf("enter the id of task you wanna delete: :");
+    scanf("%d", &id);
+
+    i = 0;
+    while (i < (*size) && task_index == -1)
+    {
+        if(id == tasks[i].id)
+            task_index = i;
+        i++;
+    }
+    printf("pass\n");
+    if (task_index == -1)
+    {
+        printf("can not be found !!!!!!\n");
+    }     
+    else
+    {
+        printf("you sure you want to delete --> %d --> : %s\n", id, tasks[task_index].title);
+        printf("enter 1 to continue 0 to quite :");
+        scanf("%d", &to_continue);
+
+        if (to_continue == 1)
+        {
+            i = task_index;
+            while (i < (*size) - 1)
+            {
+                tasks[i] = tasks[i + 1];
+                i++;
+            }
+
+            (*size)--;
+            passed++;
+        }
+    }
+    return passed;
+}
+
+void search_task(task *tasks, int size, int search_option)
+{
+    int i;
+    int task_index = -1;
+    int id;
+    char title[50];
+    char temp;
+
+    i = 0;
+    if (search_option == 1)
+    {
+        printf("enter the id of task you wanna search for :");
+        scanf("%d", &id);
+
+        while (i < size && task_index == -1)
+        {   
+            if(id == tasks[i].id)
+                task_index = i;
+            i++;
+        }
+        if (task_index == -1)
+            printf("task not found !!!!\n");
+        else display_task(tasks[task_index]);
+    }
+    else if (search_option == 2)
+    {
+        printf("enter the title of task you wanna search for :");
+        scanf("%c",&temp);
+	    fgets(title, 50, stdin);
+        title[strcspn(title, "\n")] = 0;
+
+        while (i < size && task_index == -1)
+        {   
+            if(strcmp(title, tasks[i].title) == 0)
+                task_index = i;
+            i++;
+        }
+        if (task_index == -1)
+            printf("task not found !!!!\n");
+        else display_task(tasks[task_index]);
+    }
+}
+
+void search_by(task *tasks, int size)
+{
+
+}
+
+int total_finished_tasks(task *tasks, int size)
+{
+    int total = 0;
+    int i;
+
+    i = 0;
+    while (i < size)
+    {
+        if (strcmp(tasks[i].status, "done") == 0)
+            total++;
+        i++;
+    }
+    return total;
+}
+
+int total_not_finished_tasks(task *tasks, int size)
+{
+    int total = 0;
+    int i;
+
+    i = 0;
+    while (i < size)
+    {
+        if (strcmp(tasks[i].status, "done") != 0)
+            total++;
+        i++;
+    }
+    return total;
+}
+
+void days_left_in_deadline (task *tasks, int size)
+{
+    int i;
+    Date current_date;
+    Date given_date;
+
+    time_t t;
+    t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    current_date.day = tm.tm_mday;
+    current_date.month = tm.tm_mon+1;
+    current_date.year = tm.tm_year+1900;
+
+    i = 0;          
+    while (i < size)
+    {
+        given_date = tasks[i].deadline;
+
+        printf("task : ID -----> %d\n", tasks[i].id);
+        printf("-------> %d day left\n", days_left(current_date, given_date));
+        printf(">\n");
+
+        i++;
+    }
+}
+
 int print_menu (int error)
 {
     int choice;
@@ -233,11 +585,14 @@ int print_menu (int error)
     printf("* Press 0 to add multible tasks.                              *\n");
     printf("* Press 1 to add one task.                                    *\n");
     printf("* Press 2 to disalay tasks.                                   *\n");
+    printf("* Press 3 to modify a task.                                   *\n");
+    printf("* Press 4 to delete a task.                                   *\n");
+    printf("* Press 5 to search for a task.                               *\n");
+    printf("* Press 6 to display statistics.                              *\n");
     printf("* Press -1 to quit.                                           *\n");
     printf("*-------------------------------------------------------------*\n");
     printf("* Enter your choice:                                           \n");
     scanf("%d", &choice);
-    printf("*-------------------------------------------------------------*\n");
 
     return choice;
 }
@@ -256,9 +611,6 @@ int main()
 
     while (stop != -1)
     {
-
-        //printf("enter option :");
-        //scanf("%d", &option);
 
         option = print_menu(0);
 
@@ -288,7 +640,7 @@ int main()
                 }
             }
         
-            printf("<-----------------add tasks---------------->\n");
+            printf("<---------------------------add tasks------------------------->\n");
             add_tasks(tasks, size1, size, flag);
         }
         if (option == 1)
@@ -313,16 +665,136 @@ int main()
                 }
             }
 
-            printf("<---------------add one task--------------->\n");
+            printf("<-------------------------add one task------------------------>\n");
             add_task(tasks, size);
         }
         if (option == 2)
         {
-            printf("<-------------display all tasks------------>\n");
-            display_tasks(tasks, size);
+            int sort_option;
+            printf("<------------------display all tasks--------------->\n");
+            printf("< how you wanna display tasks :                    >\n");
+            printf("< 1 sorted by alphabetical order :                 >\n");
+            printf("< 2 sorted by deadline :                           >\n");
+            printf("< 3 tasks that has 3 days or less for deadline.    >\n");
+            printf("< 0 none :                                         >\n");
+            printf("<-------------------------------------------------->\n");
+            printf("enter your choice:");
+            scanf("%d", &sort_option);
+            if (sort_option >= 1 && sort_option < 4)
+            {
+                printf("<---------------------------display--------------------------->\n");
+                display_tasks_sorted(tasks, size, sort_option);
+                if (sort_option != 3)
+                    display_tasks(tasks, size);
+            }
+            else if (sort_option == 0)
+            {
+                printf("<---------------------------display--------------------------->\n");
+                display_tasks(tasks, size);
+            }
+        }
+        if (option == 3)
+        {
+            int modify_option;
+            printf("<-------------------modify all tasks--------------->\n");
+            printf("< modification options :                           >\n");
+            printf("< 1 to modify description.                         >\n");
+            printf("< 2 to modify status.                              >\n");
+            printf("< 3 to modify deadline.                            >\n");
+            printf("< 0 quit.                                          >\n");
+            printf("<-------------------------------------------------->\n");
+            printf("enter your choice:");
+            scanf("%d", &modify_option);
+            if (modify_option >= 1 && modify_option <= 3)
+                modify_task(tasks, size, modify_option);
+        }
+        if (option == 4)
+        {
+            printf("<---------------------------delete--------------------------->\n");
+            int passed = delete_task(tasks, &size);
+            if (passed == 1)
+            {
+                tasks = (task*)realloc(tasks, (size * sizeof(task)));
+
+                if (size == 0) {
+                    free(tasks);
+                    tasks = NULL;
+                }
+            }
+        }
+        if (option == 5)
+        {
+            int search_option;
+            printf("<-----------------search for tasks----------------->\n");
+            printf("< search options :                                 >\n");
+            printf("< 1 to search by ID.                               >\n");
+            printf("< 2 to search by title.                            >\n");
+            printf("< 3 other.                                         >\n");
+            printf("< 0 quit.                                          >\n");
+            printf("<-------------------------------------------------->\n");
+            printf("enter your choice:");
+            scanf("%d", &search_option);
+            if (search_option >= 1 && search_option <= 2)
+                search_task(tasks, size, search_option);
+        }
+        if (option == 6)
+        {
+            int statistics_option;
+            printf("<--------------------statistics-------------------->\n");
+            printf("< statistics options :                             >\n");
+            printf("< 1 for total number of tasks.                     >\n");
+            printf("< 2 for finished tasks and not.                    >\n");
+            printf("< 3 for number of days for deadline.               >\n");
+            printf("< 0 quit.                                          >\n");
+            printf("<-------------------------------------------------->\n");
+            printf("enter your choice:");
+            scanf("%d", &statistics_option);
+            if (statistics_option == 1)
+            {
+                printf("<------------------------total tasks------------------------->\n");
+                printf("total number of tasks : %d\n", size);
+            }
+            else if (statistics_option == 2)
+            {
+                printf("<----------------------finished tasks------------------------>\n");
+                printf("number of finished tasks : %d\n", total_finished_tasks(tasks, size));
+                printf("number of not finished tasks : %d\n", total_not_finished_tasks(tasks, size));
+            }
+            else if (statistics_option == 3)
+            {
+                printf("<-------------------days left in deadline-------------------->\n");
+                days_left_in_deadline (tasks, size);
+            }    
         }
         if (option == -1)
             stop = -1;
+    }
+
+    int save = 0;
+    printf("<---------------------------save tasks--------------------------->\n");
+    printf("do you wanna save the data before you quit !!!\n");
+    printf("Press 1 (any other value will quit without saving) :\n");
+    scanf("%d", &save);
+    if (save == 1)
+    {
+        FILE *data;
+        int i;
+
+        data = fopen("data.txt", "a");
+
+        i = 0;
+        while (i < size)
+        {
+            fprintf(data, "%d\n", tasks[i].id);
+            fprintf(data, "%s\n", tasks[i].title);
+            fprintf(data, "%s\n", tasks[i].description);
+            fprintf(data, "%d-%d-%d\n", tasks[i].deadline.day, tasks[i].deadline.month, tasks[i].deadline.year);
+            fprintf(data, "%s\n", tasks[i].status);
+            fprintf(data, "%d-%d-%d\n", tasks[i].date.day, tasks[i].date.month, tasks[i].date.year);
+            i++;
+        }
+
+        fclose(data);
     }
 
     free(tasks);
