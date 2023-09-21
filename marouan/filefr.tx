@@ -1,0 +1,17 @@
+
+1 - Ajout de tâches (une ou plusieurs tâches).
+2 - Affichage des tâches.
+    > Tri par titre.
+    > Tri par date limite.
+    > Affichage des tâches ayant moins de 3 jours avant la date limite.
+3 - Recherche d'une tâche.
+    > Par titre.
+    > Par ID.
+    > Par date de création.
+    > Par date limite.
+4 - Suppression d'une tâche.
+5 - Modification d'une tâche.
+    > Modification de la description.
+    > Modification de l'état.
+    > Modification de la date limite.
+6 - Affichage des statistiques.

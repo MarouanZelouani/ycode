@@ -1,0 +1,20 @@
+tasks completed :
+
+1 - adding tasks (one or multiple tasks).
+2 - displaying tasks.
+    > sort by title.
+    > sort by deadline.
+    > displaying tasks that have less than 3 day in the deadline.
+3 - searching for a task.
+    > by title. 
+    > by ID.
+    > by creation date. 
+    > by deadline.
+4 - deleting a task.
+5 - modifying a task.
+    > discription modification.
+    > status modification.
+    > deadline modification
+6 - displaying statistics.
+
+
