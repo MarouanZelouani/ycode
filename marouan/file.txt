@@ -8,8 +8,6 @@ tasks completed :
 3 - searching for a task.
     > by title. 
     > by ID.
-    > by creation date. 
-    > by deadline.
 4 - deleting a task.
 5 - modifying a task.
     > discription modification.

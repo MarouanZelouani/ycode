@@ -8,18 +8,12 @@
 // search by anything ---------> completd
 // collaborateur list ---------> started
 
-typedef struct coWorker
-{
-    char name[30];
-    char email[50];
-}coWorker;
-
 typedef struct date
 {
     int day;
     int month;
     int year;
-}Date;
+} Date;
 
 typedef struct task
 {
@@ -30,6 +24,13 @@ typedef struct task
     char status[50];
     Date date;
 } task;
+
+typedef struct coWorker
+{
+    char first_name[30];
+    char last_name[30];
+    char email[50];
+} coWorker;
 
 // is valid funcction is not completed yet
 bool is_valid_date (int day, int month, int year)
@@ -197,11 +198,6 @@ void add_task(task *tasks, int size)
     tasks[size - 1].date.year = tm.tm_year+1900;
 }
 
-void flushInputBuffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF);
-}
-
 
 void add_tasks(task *tasks, int size, int s, int flag)
 {
@@ -298,7 +294,7 @@ void add_tasks(task *tasks, int size, int s, int flag)
 }
 
 // sort still not competed yet ------> done--;
-// task 3 :  task that have 3 day or les in there deadline -----> completed
+// task 3 :  task that have 3 day or les for deadline -----> completed
 // test sort by deadline ---> logic done
 void display_tasks_sorted (task *tasks, int size, int sort_type)
 {
@@ -323,7 +319,7 @@ void display_tasks_sorted (task *tasks, int size, int sort_type)
             }
             else if (sort_type == 2)
             {
-                if (tasks[i].deadline.year > (int)tasks[j].deadline.year)
+                if (tasks[i].deadline.year > tasks[j].deadline.year)
                 {
                     tmp = tasks[i];
                     tasks[i] = tasks[j];
@@ -388,9 +384,11 @@ void modify_task (task *tasks, int size, int modify_option)
     char temp;
     int error = 0;
     int print_error = 0;
+    char handler[10];
 
     printf("enter the id of task u wanna update:");
-    scanf("%d", &id);
+    scanf("%s", handler);
+    id = atoi(handler);
 
     i = 0;
     while (i < size && task_index == -1)
@@ -695,21 +693,26 @@ void read_data(task *tasks)
 int print_menu (int error)
 {
     int choice;
+    char holder[20];
 
     if (error == -1)
         printf("invalid choice!!! try again :) .\n");
     printf("*----------------------------MENU-----------------------------*\n");
-    printf("* Press 0 to add multible tasks.                              *\n");
-    printf("* Press 1 to add one task.                                    *\n");
-    printf("* Press 2 to disalay tasks.                                   *\n");
-    printf("* Press 3 to modify a task.                                   *\n");
-    printf("* Press 4 to delete a task.                                   *\n");
-    printf("* Press 5 to search for a task.                               *\n");
-    printf("* Press 6 to display statistics.                              *\n");
+    printf("* Press 1 to add multible tasks.                              *\n");
+    printf("* Press 2 to add one task.                                    *\n");
+    printf("* Press 3 to disalay tasks.                                   *\n");
+    printf("* Press 4 to modify a task.                                   *\n");
+    printf("* Press 5 to delete a task.                                   *\n");
+    printf("* Press 6 to search for a task.                               *\n");
+    printf("* Press 7 to display statistics.                              *\n");
     printf("* Press -1 to quit.                                           *\n");
     printf("*-------------------------------------------------------------*\n");
     printf("* Enter your choice:                                           \n");
-    scanf("%d", &choice);
+    scanf("%s", holder);
+
+    choice = atoi(holder);
+    if (choice == 0)
+        choice = -2;
 
     return choice;
 }
@@ -723,6 +726,9 @@ int main()
     int stop = 0;
     int flag = 0;
     int error = 0;
+
+    //coWorker cw;
+    //cw.tasks[size];
 
     /*
     tasks = (task*)malloc(3 * sizeof(task));
@@ -738,36 +744,44 @@ int main()
 
         option = print_menu(0);
 
-        if (option == 0)
-        {
-            printf("enter size :");
-            scanf("%d", &s);
-            int size1 = size;
-            size = size + s;
-
-            if (flag > 0)
-            {
-                flag++;
-                tasks = (task*)realloc(tasks, (size * sizeof(task)));
-                if (tasks == NULL) {
-                    printf("Memory allocation failed!!");
-                    return 1;
-                }
-            }
-            if (flag == 0)
-            {
-                flag++;
-                tasks = (task*)malloc(size * sizeof(task));
-                if (tasks == NULL) {
-                    printf("Memory allocation failed");
-                    return 1;
-                }
-            }
-        
-            printf("<---------------------------add tasks------------------------->\n");
-            add_tasks(tasks, size1, size, flag);
-        }
         if (option == 1)
+        {
+            char holder[10];
+            printf("enter size :");
+            scanf("%s", holder);
+            s = atoi(holder);
+            if (s == 0)
+                printf("unvalid input !!!!!\n");
+            else
+            {
+                
+                int size1 = size;
+                size = size + s;
+
+                if (flag > 0)
+                {
+                    flag++;
+                    tasks = (task*)realloc(tasks, (size * sizeof(task)));
+                    if (tasks == NULL) {
+                        printf("Memory allocation failed!!");
+                        return 1;
+                    }
+                }
+                if (flag == 0)
+                {
+                    flag++;
+                    tasks = (task*)malloc(size * sizeof(task));
+                    if (tasks == NULL) {
+                        printf("Memory allocation failed");
+                        return 1;
+                    }
+                }
+        
+                printf("<---------------------------add tasks------------------------->\n");
+                add_tasks(tasks, size1, size, flag);
+            }
+        }
+        if (option == 2)
         {
             size++;
             if (flag > 0)
@@ -792,18 +806,20 @@ int main()
             printf("<-------------------------add one task------------------------>\n");
             add_task(tasks, size);
         }
-        if (option == 2)
+        if (option == 3)
         {
             int sort_option;
+            char holder[10];
             printf("<------------------display all tasks--------------->\n");
             printf("< how you wanna display tasks :                    >\n");
             printf("< 1 sorted by alphabetical order :                 >\n");
             printf("< 2 sorted by deadline :                           >\n");
             printf("< 3 tasks that has 3 days or less for deadline.    >\n");
-            printf("< 0 none :                                         >\n");
+            printf("< 4 display :                                      >\n");
             printf("<-------------------------------------------------->\n");
             printf("enter your choice:");
-            scanf("%d", &sort_option);
+            sort_option = atoi(holder);
+            //scanf("%d", &sort_option);
             if (sort_option >= 1 && sort_option < 4)
             {
                 printf("<---------------------------display--------------------------->\n");
@@ -811,28 +827,37 @@ int main()
                 if (sort_option != 3)
                     display_tasks(tasks, size);
             }
-            else if (sort_option == 0)
+            else if (sort_option == 4)
             {
                 printf("<---------------------------display--------------------------->\n");
                 display_tasks(tasks, size);
             }
+            else if (sort_option == 0)
+            {
+                printf("unvalid input !!!!!\n");
+            }
         }
-        if (option == 3)
+        if (option == 4)
         {
             int modify_option;
+            char holder[10];
             printf("<-------------------modify all tasks--------------->\n");
             printf("< modification options :                           >\n");
             printf("< 1 to modify description.                         >\n");
             printf("< 2 to modify status.                              >\n");
             printf("< 3 to modify deadline.                            >\n");
-            printf("< 0 quit.                                          >\n");
+            printf("< -1 quit.                                         >\n");
             printf("<-------------------------------------------------->\n");
             printf("enter your choice:");
-            scanf("%d", &modify_option);
+            scanf("%s", holder);
+            modify_option = atoi(holder);
+            //scanf("%d", &modify_option);
             if (modify_option >= 1 && modify_option <= 3)
                 modify_task(tasks, size, modify_option);
+            else if (modify_option == 0)
+                printf("unvalid input !!!!!\n");
         }
-        if (option == 4)
+        if (option == 5)
         {
             printf("<---------------------------delete--------------------------->\n");
             int passed = delete_task(tasks, &size);
@@ -846,33 +871,39 @@ int main()
                 }
             }
         }
-        if (option == 5)
+        if (option == 6)
         {
             int search_option;
+            char handler[10];
             printf("<-----------------search for tasks----------------->\n");
             printf("< search options :                                 >\n");
             printf("< 1 to search by ID.                               >\n");
             printf("< 2 to search by title.                            >\n");
             printf("< 3 other.                                         >\n");
-            printf("< 0 quit.                                          >\n");
+            printf("< -1 quit.                                          >\n");
             printf("<-------------------------------------------------->\n");
             printf("enter your choice:");
-            scanf("%d", &search_option);
+            scanf("%s", handler);
+            search_option = atoi(handler);
             if (search_option >= 1 && search_option <= 3)
                 search_task(tasks, size, search_option);
+            else if (search_option == 0)
+                printf("unvalid input !!!!!\n");
         }
-        if (option == 6)
+        if (option == 7)
         {
             int statistics_option;
+            char handler[10];
             printf("<--------------------statistics-------------------->\n");
             printf("< statistics options :                             >\n");
             printf("< 1 for total number of tasks.                     >\n");
             printf("< 2 for finished tasks and not.                    >\n");
             printf("< 3 for number of days for deadline.               >\n");
-            printf("< 0 quit.                                          >\n");
+            printf("< -1 quit.                                          >\n");
             printf("<-------------------------------------------------->\n");
             printf("enter your choice:");
-            scanf("%d", &statistics_option);
+            scanf("%s", handler);
+            statistics_option = atoi(handler);
             if (statistics_option == 1)
             {
                 printf("<------------------------total tasks------------------------->\n");
@@ -888,17 +919,25 @@ int main()
             {
                 printf("<-------------------days left in deadline-------------------->\n");
                 days_left_in_deadline (tasks, size);
-            }    
+            }
+            else if (statistics_option = 0)
+            {
+                printf("unvalid input !!!!!\n");
+            }
         }
+        if (option == -2)
+            printf("error!!!! you enterd a string insted of integer\n");
         if (option == -1)
             stop = -1;
     }
 
     int save = 0;
+    char save_handler[10];
     printf("<---------------------------save tasks--------------------------->\n");
     printf("do you wanna save the data before you quit !!!\n");
     printf("Press 1 (any other value will quit without saving) :\n");
-    scanf("%d", &save);
+    scanf("%s", save_handler);
+    save = atoi(save_handler);
     if (save == 1)
     {
         FILE *data;
@@ -917,10 +956,9 @@ int main()
             fprintf(data, "%d-%d-%d\n", tasks[i].date.day, tasks[i].date.month, tasks[i].date.year);
             i++;
         }
-
         fclose(data);
     }
 
     free(tasks);
-    printf("nice you make it :)\n");
+    printf("nice, you make it :)\n");
 }

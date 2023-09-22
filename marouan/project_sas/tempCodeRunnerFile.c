@@ -1,1 +1,1 @@
-given_date
+days_left_in_deadline
