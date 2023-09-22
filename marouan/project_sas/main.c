@@ -713,7 +713,6 @@ int print_menu (int error)
     choice = atoi(holder);
     if (choice == 0)
         choice = -2;
-
     return choice;
 }
 
