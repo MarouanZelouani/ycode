@@ -4,16 +4,20 @@
 #include <string.h>
 #include <stdbool.h>
 
-// reading data from file -----> test not working 
-// search by anything ---------> completd
-// collaborateur list ---------> started
-
 typedef struct date
 {
     int day;
     int month;
     int year;
 } Date;
+
+typedef struct coWorker
+{
+    char first_name[30];
+    char last_name[30];
+    char email[50];
+} coWorker;
+
 
 typedef struct task
 {
@@ -23,16 +27,9 @@ typedef struct task
     Date deadline;
     char status[50];
     Date date;
+    coWorker cw[10];
 } task;
 
-typedef struct coWorker
-{
-    char first_name[30];
-    char last_name[30];
-    char email[50];
-} coWorker;
-
-// is valid funcction is not completed yet
 bool is_valid_date (int day, int month, int year)
 {
     time_t t;
@@ -90,6 +87,57 @@ int days_left(Date current_date, Date given_date) {
     return  given_days - current_days;
 }
 
+void add_cws (task *t)
+{
+    int yes;
+    char yes_holder[5];
+    printf("do you wanna add coworkrs 1 --> yes other value --> no :");
+    scanf("%s", yes_holder);
+    yes = atoi(yes_holder);
+
+    if (yes == 1)
+    {
+        int cw_number;
+        char cw_holder[10];
+
+        printf("Enter Co-workers number (1 ----> 10):");
+        scanf("%s", cw_holder);
+        cw_number = atoi(cw_holder);
+
+        if (cw_number > 0 && cw_number < 11)
+        {
+            int j = 0;
+            while (j < cw_number)
+            {
+                printf("First name :");
+                scanf("%s", t->cw[j].first_name);
+                printf("Last name :");
+                scanf("%s", t->cw[j].last_name);
+                printf("Email :");
+                scanf("%s", t->cw[j].email);
+                printf("----------------->\n");
+                j++;
+            }
+        }
+    }
+}
+
+void display_cw(task t)
+{
+    int i;
+
+    i = 0;
+    while (strlen(t.cw[i].email) != 0)
+    {
+        printf("CoWorker ---> %d\n", i + 1);
+        printf("First name : %s\n", t.cw[i].first_name);
+        printf("Last name : %s\n", t.cw[i].last_name);
+        printf("Email : %s\n", t.cw[i].email);
+        printf("------------>\n");
+        i++;
+    }
+}
+
 void display_task(task t)
 {
     printf("id : %d\n", t.id);
@@ -98,6 +146,7 @@ void display_task(task t)
     printf("deadline : %d-%d-%d\n", t.deadline.day, t.deadline.month, t.deadline.year);
     printf("status : %s\n", t.status);
     printf("Creation Date : %d-%d-%d\n", t.date.day, t.date.month, t.date.year);
+    display_cw(t);
     printf("---------------------->\n");
 }
 
@@ -123,6 +172,10 @@ void add_task(task *tasks, int size)
     char str[99];
     char new_str[100];
 
+    char handler1[10];
+    char handler2[10];
+    char handler3[10];
+
     tasks[size - 1].id = size;
     printf("title :");
     scanf("%c",&temp);
@@ -147,13 +200,19 @@ void add_task(task *tasks, int size)
             printf("error!!!!!\n");
             printf("invalid date ----> try again!!!!\n");
         }
-        printf("Deadline :\n");
+        printf("Deadline : (invalid input value ----> 0)\n");
         printf("day :");
-        scanf("%d", &tasks[size - 1].deadline.day);
+        scanf("%s", handler1);
+        tasks[size - 1].deadline.day = atoi(handler1); 
+        //scanf("%d", &tasks[size - 1].deadline.day);
         printf("month :");
-        scanf("%d", &tasks[size - 1].deadline.month);
+        scanf("%s", handler2);
+        tasks[size - 1].deadline.month = atoi(handler2);
+        //scanf("%d", &tasks[size - 1].deadline.month);
         printf("year :");
-        scanf("%d", &tasks[size - 1].deadline.year);
+        scanf("%s", handler3);
+        tasks[size - 1].deadline.year = atoi(handler3);
+        //scanf("%d", &tasks[size - 1].deadline.year);
         if (is_valid_date(tasks[size - 1].deadline.day, 
             tasks[size - 1].deadline.month, 
             tasks[size - 1].deadline.year))
@@ -196,6 +255,8 @@ void add_task(task *tasks, int size)
     tasks[size - 1].date.day = tm.tm_mday;
     tasks[size - 1].date.month = tm.tm_mon+1;
     tasks[size - 1].date.year = tm.tm_year+1900;
+
+    add_cws (&tasks[size - 1]);
 }
 
 
@@ -208,6 +269,10 @@ void add_tasks(task *tasks, int size, int s, int flag)
     char temp1;
     char str[99];
     char new_str[100];
+
+    char holder[10];
+    char holder1[10];
+    char holder2[10];
 
     if(flag == 1)
         i = 0;
@@ -240,13 +305,19 @@ void add_tasks(task *tasks, int size, int s, int flag)
                 printf("error!!!!!\n");
                 printf("invalid date ----> try again!!!!\n");
             }
-            printf("Deadline :\n");
+            printf("Deadline : (invalid input value --> 0)\n");
             printf("day :");
-            scanf("%d", &tasks[i].deadline.day);
+            scanf("%s", holder);
+            tasks[i].deadline.day = atoi(holder);
+            //scanf("%d", &tasks[i].deadline.day);
             printf("month :");
-            scanf("%d", &tasks[i].deadline.month);
+            scanf("%s", holder1);
+            tasks[i].deadline.month = atoi(holder1);
+            //scanf("%d", &tasks[i].deadline.month);
             printf("year :");
-            scanf("%d", &tasks[i].deadline.year);
+            scanf("%s", holder2);
+            tasks[i].deadline.year = atoi(holder2);
+            //scanf("%d", &tasks[i].deadline.year);
             if (is_valid_date(tasks[i].deadline.day, 
                 tasks[i].deadline.month, 
                 tasks[i].deadline.year))
@@ -289,13 +360,14 @@ void add_tasks(task *tasks, int size, int s, int flag)
         tasks[i].date.day = tm.tm_mday;
         tasks[i].date.month = tm.tm_mon+1;
         tasks[i].date.year = tm.tm_year+1900;
+        
+        //add co workers from 1 to 10
+        add_cws (&tasks[i]);
+
         i++;
     }
 }
 
-// sort still not competed yet ------> done--;
-// task 3 :  task that have 3 day or les for deadline -----> completed
-// test sort by deadline ---> logic done
 void display_tasks_sorted (task *tasks, int size, int sort_type)
 {
     int i;
@@ -303,77 +375,89 @@ void display_tasks_sorted (task *tasks, int size, int sort_type)
     task tmp;
 
     i = 0;
-    while (i < size - 1)
+    if (sort_type == 1 ||  sort_type == 2)
     {
-        j = i + 1;
-        while (j < size)
+        while (i < size - 1)
         {
-            if (sort_type == 1)
+            j = i + 1;
+            while (j < size)
             {
-                if (tasks[i].title[0] > tasks[j].title[0])
+                if (sort_type == 1)
                 {
-                    tmp = tasks[i];
-                    tasks[i] = tasks[j];
-                    tasks[j] = tmp;
-                }
-            }
-            else if (sort_type == 2)
-            {
-                if (tasks[i].deadline.year > tasks[j].deadline.year)
-                {
-                    tmp = tasks[i];
-                    tasks[i] = tasks[j];
-                    tasks[j] = tmp;
-                }
-                else if (tasks[i].deadline.year == tasks[j].deadline.year)
-                {
-                    if (tasks[i].deadline.month > tasks[j].deadline.month)
+                    if (tasks[i].title[0] > tasks[j].title[0])
                     {
                         tmp = tasks[i];
                         tasks[i] = tasks[j];
                         tasks[j] = tmp;
                     }
-                    else if (tasks[i].deadline.month == tasks[j].deadline.month)
+                }
+                else if (sort_type == 2)
+                {
+                    if (tasks[i].deadline.year > tasks[j].deadline.year)
                     {
-                        if (tasks[i].deadline.day > tasks[j].deadline.day)
+                        tmp = tasks[i];
+                        tasks[i] = tasks[j];
+                        tasks[j] = tmp;
+                    }
+                    else if (tasks[i].deadline.year == tasks[j].deadline.year)
+                    {
+                        if (tasks[i].deadline.month > tasks[j].deadline.month)
                         {
                             tmp = tasks[i];
                             tasks[i] = tasks[j];
                             tasks[j] = tmp;
                         }
+                        else if (tasks[i].deadline.month == tasks[j].deadline.month)
+                        {
+                            if (tasks[i].deadline.day > tasks[j].deadline.day)
+                            {
+                                tmp = tasks[i];
+                                tasks[i] = tasks[j];
+                                tasks[j] = tmp;
+                            }
+                        }
                     }
                 }
+                j++;
             }
-            else if (sort_type == 3)
-            {
-                int i = 0;
-                Date current_date;
-                Date given_date;
-
-                time_t t;
-                t = time(NULL);
-                struct tm tm = *localtime(&t);
-
-                current_date.day = tm.tm_mday;
-                current_date.month = tm.tm_mon+1;
-                current_date.year = tm.tm_year+1900;
-                
-                while (i < size)
-                {
-                    given_date = tasks[i].deadline;
-                
-                    if (days_left(current_date, given_date) <= 3)
-                    {
-                        printf("--------> %d day left\n", days_left(current_date, given_date));
-                        display_task(tasks[i]);
-                    }
-                    i++;
-                }  
-            }
-            j++;
+            i++;
         }
-        i++;
     }
+    else if (sort_type == 3)
+    {
+        int i = 0;
+        Date current_date;
+        Date given_date;
+
+        time_t t;
+        t = time(NULL);
+        struct tm tm = *localtime(&t);
+
+        current_date.day = tm.tm_mday;
+        current_date.month = tm.tm_mon+1;
+        current_date.year = tm.tm_year+1900;
+                
+        while (i < size)
+        {
+            given_date = tasks[i].deadline;
+                
+            if (days_left(current_date, given_date) <= 3)
+            {
+                printf("--------> %d days left\n", days_left(current_date, given_date));
+                display_task(tasks[i]);
+            }
+            i++;
+        }  
+    }
+}
+
+int count_coWorkers(task t)
+{
+    int i = 0;
+
+    while (strlen(t.cw[i].email) != 0)
+        i++;
+    return i;
 }
 
 void modify_task (task *tasks, int size, int modify_option)
@@ -386,6 +470,10 @@ void modify_task (task *tasks, int size, int modify_option)
     int print_error = 0;
     char handler[10];
 
+    char holder[10];
+    char holder1[10];
+    char holder2[10];
+
     printf("enter the id of task u wanna update:");
     scanf("%s", handler);
     id = atoi(handler);
@@ -393,7 +481,6 @@ void modify_task (task *tasks, int size, int modify_option)
     i = 0;
     while (i < size && task_index == -1)
     {
-        printf("1\n");
         if(id == tasks[i].id)
             task_index = i;
         i++;
@@ -406,10 +493,22 @@ void modify_task (task *tasks, int size, int modify_option)
         printf("task you wanna modify --> %d : %s\n", id, tasks[task_index].title);
         if (modify_option == 1)
         {
+            // desc na9sa b7arf
+            char str[99];
+            char new_str[100];
             printf("new description :");
-            scanf("%c",&temp);
-	        fgets(tasks[task_index].description, 100, stdin);
-            tasks[task_index].description[strcspn(tasks[task_index].description, "\n")] = 0;
+            scanf(" %c",&temp);
+	        //fgets(tasks[task_index].description, 100, stdin);
+            //tasks[task_index].description[strcspn(tasks[task_index].description, "\n")] = '\0';
+
+            fgets(str, 99, stdin);
+            str[strcspn(str, "\n")] = '\0';
+
+            new_str[0] = temp;
+            new_str[1] = '\0';
+
+            strcat(new_str, str);
+            strcpy(tasks[task_index].description, new_str);
         }
         else if (modify_option == 2)
         {
@@ -427,13 +526,50 @@ void modify_task (task *tasks, int size, int modify_option)
                     strcmp(tasks[task_index].status, "done") == 0)
                 {
                     error = 1;
+                    if (strcmp(tasks[task_index].status, "done") == 0)
+                    {
+                        if (count_coWorkers(tasks[task_index]) > 0)
+                        {   
+                            int er = 0;
+                            int print_er = 0;
+                            while (er ==0)
+                            {
+                                char h[5];
+                                int o;
+                                display_cw(tasks[task_index]);
+                                if (print_er != 0)
+                                    printf("error!!!!!\n");
+                                printf("Enter number of the coWorker that finished this task :");
+                                scanf("%s", h);
+                                o = atoi(h);
+                                if (o > 0 && o <= count_coWorkers(tasks[task_index]))
+                                {
+                                    er = 1;
+                                    if (count_coWorkers(tasks[task_index]) > 1)
+                                    {
+                                        tasks[task_index].cw[0] = tasks[task_index].cw[o - 1];
+                                        int k = 1;
+                                        while (k < count_coWorkers(tasks[task_index]))
+                                        {
+                                            tasks[task_index].cw[k].first_name[0] = '\0';
+                                            tasks[task_index].cw[k].last_name[0] = '\0';
+                                            tasks[task_index].cw[k].email[0] = '\0';
+                                            k++;
+                                        }
+                                    }
+                                }
+                                else 
+                                    print_er = 1;
+                            }
+                            
+                        }  
+                    }
                 }
                 else print_error = 1;
             }
 
             error = 0;
             print_error = 0;
-
         }
         else if (modify_option == 3)
         {
@@ -444,13 +580,19 @@ void modify_task (task *tasks, int size, int modify_option)
                     printf("error!!!!!\n");
                     printf("invalid date ----> try again!!!!\n");
                 }
-                printf("new Deadline :\n");
+                printf("new Deadline : (invalid input ---> 0)\n");
                 printf("day :");
-                scanf("%d", &tasks[task_index].deadline.day);
+                scanf("%s", holder);
+                tasks[task_index].deadline.day = atoi(holder);
+                //scanf("%d", &tasks[task_index].deadline.day);
                 printf("month :");
-                scanf("%d", &tasks[task_index].deadline.month);
+                scanf("%s", holder1);
+                tasks[task_index].deadline.month = atoi(holder1);
+                //scanf("%d", &tasks[task_index].deadline.month);
                 printf("year :");
-                scanf("%d", &tasks[task_index].deadline.year);
+                scanf("%s", holder2);
+                tasks[task_index].deadline.year = atoi(holder2);
+                //scanf("%d", &tasks[task_index].deadline.year);
                 if (is_valid_date(tasks[task_index].deadline.day, 
                     tasks[task_index].deadline.month, 
                     tasks[task_index].deadline.year))
@@ -474,8 +616,13 @@ int delete_task (task *tasks, int *size)
     int to_continue = 0;
     int passed = 0;
 
-    printf("enter the id of task you wanna delete: :");
-    scanf("%d", &id);
+    char holder1[10];
+    char holder2[10];
+
+    printf("enter the id of task you wanna delete :");
+    scanf("%s", holder1);
+    //scanf("%d", &id);
+    id = atoi(holder1);
 
     i = 0;
     while (i < (*size) && task_index == -1)
@@ -484,16 +631,18 @@ int delete_task (task *tasks, int *size)
             task_index = i;
         i++;
     }
-    printf("pass\n");
+    
     if (task_index == -1)
     {
         printf("can not be found !!!!!!\n");
     }     
     else
     {
-        printf("you sure you want to delete --> %d --> : %s\n", id, tasks[task_index].title);
-        printf("enter 1 to continue 0 to quite :");
-        scanf("%d", &to_continue);
+        printf("you sure you want to delete -->ID : %d --> title : %s\n", id, tasks[task_index].title);
+        printf("enter 1 to continue (other value) to quite :");
+        scanf("%s", holder2);
+        to_continue = atoi(holder2);
+        //scanf("%d", &to_continue);
 
         if (to_continue == 1)
         {
@@ -508,6 +657,7 @@ int delete_task (task *tasks, int *size)
             passed++;
         }
     }
+    if (id == 0) printf("invalid input !!!!!\n");
     return passed;
 }
 
@@ -518,12 +668,14 @@ void search_task(task *tasks, int size, int search_option)
     int id;
     char title[50];
     char temp;
+    char holder[10];
 
     i = 0;
     if (search_option == 1)
     {
         printf("enter the id of task you wanna search for :");
-        scanf("%d", &id);
+        scanf("%s", holder);
+        id = atoi(holder);
 
         while (i < size && task_index == -1)
         {   
@@ -531,7 +683,9 @@ void search_task(task *tasks, int size, int search_option)
                 task_index = i;
             i++;
         }
-        if (task_index == -1)
+        if (id == 0)
+            printf("invalid input!!!!\n");
+        else if (task_index == -1)
             printf("task not found !!!!\n");
         else display_task(tasks[task_index]);
     }
@@ -540,7 +694,7 @@ void search_task(task *tasks, int size, int search_option)
         printf("enter the title of task you wanna search for :");
         scanf("%c",&temp);
 	    fgets(title, 50, stdin);
-        title[strcspn(title, "\n")] = 0;
+        title[strcspn(title, "\n")] = '\0';
 
         while (i < size && task_index == -1)
         {   
@@ -603,12 +757,9 @@ void search_task(task *tasks, int size, int search_option)
             if (task_index == -1) printf("no tasks with matching deadline!!!!\n");
         }
     }
+    if (id == 0) printf ("invalid input!!!!\n");
 }
 
-void search_by(task *tasks, int size)
-{
-
-}
 
 int total_finished_tasks(task *tasks, int size)
 {
@@ -667,6 +818,8 @@ void days_left_in_deadline (task *tasks, int size)
     }
 }
 
+
+// make changes 
 void read_data(task *tasks)
 {
     FILE *data;
@@ -750,7 +903,7 @@ int main()
             scanf("%s", holder);
             s = atoi(holder);
             if (s == 0)
-                printf("unvalid input !!!!!\n");
+                printf("invalid input !!!!!\n");
             else
             {
                 
@@ -817,6 +970,7 @@ int main()
             printf("< 4 display :                                      >\n");
             printf("<-------------------------------------------------->\n");
             printf("enter your choice:");
+            scanf("%s", holder);
             sort_option = atoi(holder);
             //scanf("%d", &sort_option);
             if (sort_option >= 1 && sort_option < 4)
@@ -833,7 +987,7 @@ int main()
             }
             else if (sort_option == 0)
             {
-                printf("unvalid input !!!!!\n");
+                printf("invalid input !!!!!\n");
             }
         }
         if (option == 4)
@@ -854,7 +1008,7 @@ int main()
             if (modify_option >= 1 && modify_option <= 3)
                 modify_task(tasks, size, modify_option);
             else if (modify_option == 0)
-                printf("unvalid input !!!!!\n");
+                printf("invalid input !!!!!\n");
         }
         if (option == 5)
         {
@@ -887,7 +1041,7 @@ int main()
             if (search_option >= 1 && search_option <= 3)
                 search_task(tasks, size, search_option);
             else if (search_option == 0)
-                printf("unvalid input !!!!!\n");
+                printf("invalid input !!!!!\n");
         }
         if (option == 7)
         {
@@ -921,7 +1075,7 @@ int main()
             }
             else if (statistics_option = 0)
             {
-                printf("unvalid input !!!!!\n");
+                printf("invalid input !!!!!\n");
             }
         }
         if (option == -2)
@@ -947,11 +1101,11 @@ int main()
         i = 0;
         while (i < size)
         {
-            fprintf(data, "%d\n", tasks[i].id);
-            fprintf(data, "%s\n", tasks[i].title);
-            fprintf(data, "%s\n", tasks[i].description);
-            fprintf(data, "%d-%d-%d\n", tasks[i].deadline.day, tasks[i].deadline.month, tasks[i].deadline.year);
-            fprintf(data, "%s\n", tasks[i].status);
+            fprintf(data, "%d ", tasks[i].id);
+            fprintf(data, "%s ", tasks[i].title);
+            fprintf(data, "%s ", tasks[i].description);
+            fprintf(data, "%d-%d-%d ", tasks[i].deadline.day, tasks[i].deadline.month, tasks[i].deadline.year);
+            fprintf(data, "%s ", tasks[i].status);
             fprintf(data, "%d-%d-%d\n", tasks[i].date.day, tasks[i].date.month, tasks[i].date.year);
             i++;
         }

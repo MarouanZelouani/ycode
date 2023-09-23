@@ -1,1 +1,0 @@
-days_left_in_deadline
