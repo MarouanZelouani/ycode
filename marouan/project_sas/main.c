@@ -36,7 +36,7 @@ bool is_valid_date (int day, int month, int year)
     t = time(NULL);
     struct tm tm = *localtime(&t);
 
-    if (year < 1900 || year > 2100)
+    if (year < 2000 || year > 2100)
         return false;
 
     if (month < 1 || month > 12)
@@ -638,7 +638,7 @@ int delete_task (task *tasks, int *size)
     }     
     else
     {
-        printf("you sure you want to delete -->ID : %d --> title : %s\n", id, tasks[task_index].title);
+        printf("you sure you want to delete --> ID : %d --> title : %s\n", id, tasks[task_index].title);
         printf("enter 1 to continue (other value) to quite :");
         scanf("%s", holder2);
         to_continue = atoi(holder2);
